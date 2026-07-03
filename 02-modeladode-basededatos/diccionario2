@@ -1,0 +1,31 @@
+Diccionario de datos - Ejercicio 1: Hospital
+
+Entidades identificadas: Paciente, ExpedienteMedico
+
+Tabla: Paciente
+
+| Campo           | Tipo    | Longitud | Restriciones | Descripcion                  |
+| NumeroPaciente  | INT     | -        | PK,AI,NN     | Identificador del paciente   |
+| Nombre          | Varchar | 100      | NN           | Nombre del paciente          |
+| FechaNacimiento | Date    | -        | NN           | Fecha de nacimiento          |
+
+Tabla: ExpedienteMedico
+
+| Campo            | Tipo    | Longitud | Restriciones | Descripcion                    |
+| NumeroExpediente | INT     | -        | PK,AI,NN     | Identificador del expediente   |
+| FechaApertura    | Date    | -        | NN           | Fecha en que se abrio          |
+| TipoSangre       | Varchar | 5        | NN           | Tipo de sangre del paciente    |
+| NumeroPaciente   | INT     | -        | NN,FK,UQ     | Paciente al que pertenece      |
+
+Cardinalidad y participacion
+
+| Relacion                        | Cardinalidad | Participacion Paciente | Participacion Expediente |
+| Paciente - ExpedienteMedico     | 1:1          | Obligatoria (total)    | Obligatoria (total)      |
+
+Reglas de negocio aplicadas
+
+
+RN-01: Cada paciente debe tener un expediente medico (no puede existir paciente sin expediente)
+RN-02: Cada expediente pertenece a un unico paciente (no puede existir expediente sin paciente)
+Al ser 1:1 con participacion obligatoria en ambos lados, la FK lleva restriccion UQ para blindar que no se repita
+![diccionario2](../img/ER/tablas2.png)

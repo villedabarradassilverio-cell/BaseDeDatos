@@ -1,0 +1,39 @@
+# Diccionario de datos - Ejercicio 3: Escuela
+
+**Entidades identificadas:** Alumno, Materia, Inscribe (entidad asociativa)
+
+**Tabla:** _Alumno_
+
+| Campo      | Tipo    | Longitud | Restriciones | Descripcion              |
+| Matricula  | Varchar | 10       | PK,NN        | Matricula del alumno     |
+| Nombre     | Varchar | 100      | NN           | Nombre del alumno        |
+| Semestre   | INT     | -        | NN,CK (>0)   | Semestre que cursa       |
+
+**Tabla:** _Materia_
+
+| Campo         | Tipo    | Longitud | Restriciones | Descripcion              |
+| ClaveMateria  | Varchar | 10       | PK,NN        | Clave de la materia      |
+| NombreMateria | Varchar | 100      | NN           | Nombre de la materia     |
+| Creditos      | INT     | -        | NN,CK (>0)   | Numero de creditos       |
+
+**Tabla:** _Inscribe_ (resuelve la relacion N:M entre Alumno y Materia)
+
+| Campo             | Tipo         | Longitud | Restriciones | Descripcion                    |
+| Matricula         | Varchar      | 10       | PK,FK,NN     | Alumno inscrito                |
+| ClaveMateria      | Varchar      | 10       | PK,FK,NN     | Materia en la que se inscribe  |
+| FechaInscripcion  | Date         | -        | NN           | Fecha en que se inscribio      |
+| CalificacionFinal | Decimal(4,2) | -        | -            | Calificacion final obtenida    |
+
+**Cardinalidad y participacion**
+
+| Relacion            | Cardinalidad | Participacion Alumno/Materia | Participacion Inscribe |
+| Alumno - Inscribe   | 1:N          | Obligatoria (total)          | Obligatoria (total)    |
+| Materia - Inscribe  | 1:N          | Obligatoria (total)          | Opcional (parcial)     |
+
+**Reglas de negocio aplicadas**
+- RN-01: Un alumno puede inscribirse en varias materias
+- RN-02: Una materia puede tener muchos alumnos inscritos
+- RN-03: Puede existir una materia sin alumnos inscritos (participacion opcional del lado Materia hacia Inscribe)
+- RN-04: Todo alumno debe estar inscrito en al menos una materia (participacion obligatoria del lado Alumno hacia Inscribe)
+- RN-05: La clave primaria de Inscribe es compuesta (Matricula + ClaveMateria)
+![diccionario3](../img/ER/tablas3.png)

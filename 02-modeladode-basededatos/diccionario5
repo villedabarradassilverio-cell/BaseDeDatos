@@ -1,0 +1,78 @@
+# Diccionario de datos - Ejercicio 5: Biblioteca
+
+**Entidades identificadas:** Autor, Libro, Editorial, Escribe (asociativa N:M), Ejemplar (entidad debil), Usuario, Prestamo
+
+**Tabla:** _Autor_
+
+| Campo         | Tipo    | Longitud | Restriciones | Descripcion              |
+| NumeroAutor   | INT     | -        | PK,AI,NN     | Identificador del autor  |
+| Nombre        | Varchar | 100      | NN           | Nombre del autor         |
+| Nacionalidad  | Varchar | 50       | NN           | Nacionalidad del autor   |
+
+**Tabla:** _Libro_
+
+| Campo           | Tipo    | Longitud | Restriciones | Descripcion                  |
+| ISBN            | Varchar | 20       | PK,NN        | Identificador del libro      |
+| Titulo          | Varchar | 150      | NN           | Titulo del libro             |
+| AnioPublicacion | INT     | -        | NN           | Anio en que se publico       |
+| NumPaginas      | INT     | -        | NN,CK (>0)   | Numero de paginas            |
+| NumeroEditorial | INT     | -        | NN,FK        | Editorial que lo publico     |
+
+**Tabla:** _Editorial_
+
+| Campo           | Tipo    | Longitud | Restriciones | Descripcion                |
+| NumeroEditorial | INT     | -        | PK,AI,NN     | Identificador de la editorial |
+| Nombre          | Varchar | 100      | NN           | Nombre de la editorial     |
+| Pais            | Varchar | 50       | NN           | Pais de origen              |
+
+**Tabla:** _Escribe_ (resuelve la relacion N:M entre Libro y Autor)
+
+| Campo        | Tipo    | Longitud | Restriciones | Descripcion            |
+| ISBN         | Varchar | 20       | PK,FK,NN     | Libro escrito           |
+| NumeroAutor  | INT     | -        | PK,FK,NN     | Autor que lo escribio    |
+
+**Tabla:** _Ejemplar_ (entidad debil, no puede existir sin Libro)
+
+| Campo          | Tipo    | Longitud | Restriciones | Descripcion                  |
+| ISBN           | Varchar | 20       | PK,FK,NN     | Libro al que pertenece       |
+| NumeroEjemplar | INT     | -        | PK,NN        | Numero consecutivo de copia  |
+| Estado         | Varchar | 20       | NN           | Nuevo, usado o dañado        |
+| Ubicacion      | Varchar | 30       | NN           | Ubicacion en el estante      |
+
+**Tabla:** _Usuario_
+
+| Campo         | Tipo    | Longitud | Restriciones | Descripcion              |
+| NumeroUsuario | INT     | -        | PK,AI,NN     | Identificador del usuario |
+| Nombre        | Varchar | 100      | NN           | Nombre del usuario        |
+| TipoUsuario   | Varchar | 20       | NN,CK        | Estudiante, docente o externo |
+
+**Tabla:** _Prestamo_
+
+| Campo           | Tipo | Longitud | Restriciones | Descripcion                     |
+| NumeroPrestamo  | INT  | -        | PK,AI,NN     | Identificador del prestamo      |
+| FechaPrestamo   | Date | -        | NN           | Fecha en que se realizo         |
+| FechaLimite     | Date | -        | NN           | Fecha limite de devolucion      |
+| FechaDevolucion | Date | -        | -            | Fecha real de devolucion (nulo si sigue prestado) |
+| ISBN            | Varchar | 20    | NN,FK        | Libro del ejemplar prestado     |
+| NumeroEjemplar  | INT  | -        | NN,FK        | Ejemplar prestado               |
+| NumeroUsuario   | INT  | -        | NN,FK        | Usuario que lo solicito         |
+
+**Cardinalidad y participacion**
+
+| Relacion              | Cardinalidad | Participacion lado 1      | Participacion lado N          |
+| Autor - Escribe       | 1:N          | Obligatoria (Autor)       | Opcional (Escribe)             |
+| Libro - Escribe       | 1:N          | Obligatoria (Libro)       | Obligatoria (Escribe)          |
+| Editorial - Libro     | 1:N          | Opcional (Editorial)      | Obligatoria (Libro)            |
+| Libro - Ejemplar      | 1:N          | Obligatoria (Libro)       | Opcional (Ejemplar)            |
+| Ejemplar - Prestamo   | 1:N          | Obligatoria (Ejemplar)    | Opcional (Prestamo)            |
+| Usuario - Prestamo    | 1:N          | Obligatoria (Usuario)     | Opcional (Prestamo)            |
+
+**Reglas de negocio aplicadas**
+- RN-01: Un libro puede ser escrito por varios autores, y un autor puede haber escrito varios libros (M:N resuelto con Escribe)
+- RN-02: Cada libro pertenece a una sola editorial; una editorial puede no tener libros aun en el catalogo
+- RN-03: Un ejemplar no puede existir sin el libro al que pertenece (entidad debil, clave compuesta ISBN + NumeroEjemplar)
+- RN-04: Un libro puede existir en el catalogo sin tener ejemplares fisicos disponibles
+- RN-05: Un prestamo no puede existir sin un ejemplar ni sin un usuario
+- RN-06: Un ejemplar o un usuario pueden no tener ningun prestamo asociado
+
+![diccionario5](../img/ER/tabla5.png)

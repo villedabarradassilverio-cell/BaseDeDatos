@@ -1,0 +1,74 @@
+# Diccionario de datos - Ejercicio 6: Empresa
+
+**Entidades identificadas:** Departamento, Empleado (con relacion recursiva de supervision), Proyecto, Asignacion (asociativa N:M), EmpleadoPlanta y EmpleadoHonorarios (subtipos por especializacion ISA)
+
+**Tabla:** _Departamento_
+
+| Campo               | Tipo          | Longitud | Restriciones | Descripcion                |
+| NumeroDepartamento  | INT           | -        | PK,AI,NN     | Identificador del departamento |
+| NombreDepartamento  | Varchar       | 100      | NN           | Nombre del departamento    |
+| PresupuestoAnual    | Decimal(12,2) | -        | NN,CK (>0)   | Presupuesto asignado       |
+
+**Tabla:** _Empleado_
+
+| Campo               | Tipo          | Longitud | Restriciones | Descripcion                          |
+| NumeroEmpleado      | INT           | -        | PK,AI,NN     | Identificador del empleado           |
+| Nombre              | Varchar       | 100      | NN           | Nombre del empleado                  |
+| FechaContratacion   | Date          | -        | NN           | Fecha de ingreso                     |
+| SalarioBase         | Decimal(10,2) | -        | NN,CK (>0)   | Salario base                         |
+| NumeroDepartamento  | INT           | -        | NN,FK        | Departamento al que pertenece        |
+| NumeroSupervisor    | INT           | -        | FK           | Empleado que lo supervisa (nulo si es el director general) |
+
+**Tabla:** _Proyecto_
+
+| Campo                 | Tipo | Longitud | Restriciones | Descripcion                  |
+| NumeroProyecto        | INT  | -        | PK,AI,NN     | Identificador del proyecto   |
+| NombreProyecto        | Varchar | 100   | NN           | Nombre del proyecto          |
+| FechaInicio           | Date | -        | NN           | Fecha de inicio              |
+| FechaTerminoEstimada  | Date | -        | NN           | Fecha estimada de termino    |
+
+**Tabla:** _Asignacion_ (resuelve la relacion N:M entre Empleado y Proyecto)
+
+| Campo           | Tipo | Longitud | Restriciones | Descripcion                |
+| NumeroEmpleado  | INT  | -        | PK,FK,NN     | Empleado asignado           |
+| NumeroProyecto  | INT  | -        | PK,FK,NN     | Proyecto al que se asigna    |
+| Rol             | Varchar | 50    | NN           | Rol dentro del proyecto      |
+| HorasSemanales  | INT  | -        | NN,CK (>0)   | Horas asignadas por semana   |
+
+**Tabla:** _EmpleadoPlanta_ (subtipo de Empleado)
+
+| Campo               | Tipo    | Longitud | Restriciones | Descripcion                |
+| NumeroEmpleado      | INT     | -        | PK,FK,NN     | Referencia al empleado padre |
+| NumeroSeguroSocial  | Varchar | 20       | NN,UQ        | Numero de seguro social     |
+| Prestaciones        | Varchar | 100      | -            | Prestaciones que recibe     |
+
+**Tabla:** _EmpleadoHonorarios_ (subtipo de Empleado)
+
+| Campo                 | Tipo    | Longitud | Restriciones | Descripcion                |
+| NumeroEmpleado        | INT     | -        | PK,FK,NN     | Referencia al empleado padre |
+| RFC                   | Varchar | 15       | NN,UQ        | RFC del empleado             |
+| FechaTerminoContrato  | Date    | -        | NN           | Fecha de termino de contrato |
+
+**Cardinalidad y participacion**
+
+| Relacion                       | Cardinalidad | Participacion lado 1        | Participacion lado N          |
+| Departamento - Empleado        | 1:N          | Obligatoria (Departamento)  | Opcional (Empleado)            |
+| Empleado - Asignacion          | 1:N          | Obligatoria (Empleado)      | Opcional (Asignacion)          |
+| Proyecto - Asignacion          | 1:N          | Obligatoria (Proyecto)      | Obligatoria (Asignacion)       |
+| Empleado - Empleado (Supervisa)| 1:N          | Opcional (supervisor)       | Opcional (supervisados)        |
+
+**Especializacion (ISA)**
+- Empleado se especializa en EmpleadoPlanta y EmpleadoHonorarios
+- Tipo: **total y exclusiva (disjunta)** — todo empleado es de uno de los dos subtipos y nunca de ambos
+
+**Reglas de negocio aplicadas**
+- RN-01: Cada empleado pertenece a un solo departamento; todo empleado debe tener departamento
+- RN-02: Un departamento puede no tener empleados asignados todavia
+- RN-03: Un empleado puede supervisar a varios empleados, pero solo tiene un supervisor directo (relacion recursiva 1:N sobre Empleado)
+- RN-04: Todo empleado, excepto el director general, debe tener un supervisor (por eso NumeroSupervisor no es NN a nivel fisico, aunque la regla de negocio lo exige salvo para ese caso especial)
+- RN-05: Un empleado puede participar en varios proyectos y un proyecto puede tener varios empleados asignados (M:N resuelto con Asignacion)
+- RN-06: Un empleado puede no estar asignado a ningun proyecto en un momento dado
+- RN-07: Todo proyecto debe tener asignado al menos un empleado
+- RN-08: Todo empleado es de planta o por honorarios, nunca ambos (especializacion total y exclusiva)
+
+![diccionario6](../img/ER/tabla6.png)

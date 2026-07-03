@@ -1,0 +1,91 @@
+# Diccionario de datos - Ejercicio 7: Aerolinea
+
+**Entidades identificadas:** Aeropuerto, Vuelo, Avion, Piloto, Pasajero, Asiento (entidad debil), VueloPiloto (asociativa N:M), Reservacion (asociativa N:M)
+
+**Tabla:** _Aeropuerto_
+
+| Campo             | Tipo    | Longitud | Restriciones | Descripcion                |
+| CodigoIATA        | Varchar | 3        | PK,NN        | Codigo IATA del aeropuerto |
+| NombreAeropuerto  | Varchar | 100      | NN           | Nombre del aeropuerto      |
+| Ciudad            | Varchar | 50       | NN           | Ciudad donde se ubica      |
+| Pais              | Varchar | 50       | NN           | Pais donde se ubica        |
+
+**Tabla:** _Vuelo_
+
+| Campo             | Tipo     | Longitud | Restriciones | Descripcion                        |
+| NumeroVuelo       | INT      | -        | PK,AI,NN     | Identificador del vuelo            |
+| FechaHoraSalida   | Datetime | -        | NN           | Fecha y hora de salida             |
+| FechaHoraLlegada  | Datetime | -        | NN           | Fecha y hora de llegada            |
+| DuracionEstimada  | Time     | -        | NN           | Duracion estimada del vuelo        |
+| NumeroMatricula   | Varchar  | 10       | NN,FK        | Avion que opera el vuelo           |
+| CodigoOrigen      | Varchar  | 3        | NN,FK        | Aeropuerto de salida                |
+| CodigoDestino     | Varchar  | 3        | NN,FK        | Aeropuerto de llegada                |
+
+**Tabla:** _Avion_
+
+| Campo               | Tipo    | Longitud | Restriciones | Descripcion                |
+| NumeroMatricula     | Varchar | 10       | PK,NN        | Matricula del avion        |
+| Modelo              | Varchar | 50       | NN           | Modelo del avion           |
+| CapacidadPasajeros  | INT     | -        | NN,CK (>0)   | Capacidad maxima            |
+
+**Tabla:** _Piloto_
+
+| Campo                  | Tipo    | Longitud | Restriciones | Descripcion                |
+| NumeroLicencia         | Varchar | 15       | PK,NN        | Licencia del piloto         |
+| Nombre                 | Varchar | 100      | NN           | Nombre del piloto           |
+| HorasVueloAcumuladas   | INT     | -        | NN,CK (>=0)  | Horas de vuelo acumuladas   |
+
+**Tabla:** _Pasajero_
+
+| Campo            | Tipo    | Longitud | Restriciones | Descripcion              |
+| NumeroPasaporte  | Varchar | 15       | PK,NN        | Pasaporte del pasajero    |
+| Nombre           | Varchar | 100      | NN           | Nombre del pasajero       |
+| Nacionalidad     | Varchar | 50       | NN           | Nacionalidad              |
+
+**Tabla:** _Asiento_ (entidad debil, no puede existir sin Avion)
+
+| Campo            | Tipo    | Longitud | Restriciones | Descripcion                |
+| NumeroMatricula  | Varchar | 10       | PK,FK,NN     | Avion al que pertenece     |
+| NumeroAsiento    | Varchar | 5        | PK,NN        | Numero del asiento          |
+| Clase            | Varchar | 20       | NN,CK        | Turista, ejecutiva o primera |
+
+**Tabla:** _VueloPiloto_ (resuelve la relacion N:M entre Vuelo y Piloto)
+
+| Campo           | Tipo    | Longitud | Restriciones | Descripcion               |
+| NumeroVuelo     | INT     | -        | PK,FK,NN     | Vuelo asignado             |
+| NumeroLicencia  | Varchar | 15       | PK,FK,NN     | Piloto asignado             |
+| Rol             | Varchar | 20       | NN,CK        | Piloto al mando o copiloto  |
+
+**Tabla:** _Reservacion_ (resuelve la relacion N:M entre Vuelo y Pasajero)
+
+| Campo              | Tipo    | Longitud | Restriciones | Descripcion                     |
+| CodigoReservacion  | Varchar | 10       | PK,NN        | Identificador de la reservacion |
+| NumeroVuelo        | INT     | -        | NN,FK        | Vuelo reservado                  |
+| NumeroPasaporte    | Varchar | 15       | NN,FK        | Pasajero que reservo             |
+| AsientoAsignado    | Varchar | 5        | NN           | Asiento asignado                 |
+| Estado             | Varchar | 20       | NN,CK        | Confirmada, cancelada o pendiente|
+
+**Cardinalidad y participacion**
+
+| Relacion                       | Cardinalidad | Participacion lado 1       | Participacion lado N        |
+| Aeropuerto - Vuelo (ORIGEN)    | 1:N          | Obligatoria (Aeropuerto)   | Opcional (Vuelo)             |
+| Aeropuerto - Vuelo (DESTINO)   | 1:N          | Obligatoria (Aeropuerto)   | Opcional (Vuelo)             |
+| Avion - Vuelo                  | 1:N          | Obligatoria (Avion)        | Opcional (Vuelo)             |
+| Avion - Asiento                | 1:N          | Obligatoria (Avion)        | Obligatoria (Asiento)        |
+| Vuelo - VueloPiloto            | 1:N          | Obligatoria (Vuelo)        | Obligatoria (VueloPiloto)    |
+| Piloto - VueloPiloto           | 1:N          | Obligatoria (Piloto)       | Opcional (VueloPiloto)       |
+| Vuelo - Reservacion            | 1:N          | Obligatoria (Vuelo)        | Opcional (Reservacion)       |
+| Pasajero - Reservacion         | 1:N          | Obligatoria (Pasajero)     | Opcional (Reservacion)       |
+
+**Reglas de negocio aplicadas**
+- RN-01: Cada vuelo tiene un aeropuerto de origen y uno de destino; se modelan como dos relaciones distintas entre Vuelo y Aeropuerto
+- RN-02: Cada vuelo es operado por un solo avion; un avion puede estar sin vuelos asignados (mantenimiento)
+- RN-03: Un asiento no puede existir sin el avion al que pertenece (entidad debil, clave compuesta NumeroMatricula + NumeroAsiento)
+- RN-04: Un avion debe tener al menos un asiento configurado (participacion obligatoria de Asiento)
+- RN-05: Un vuelo requiere minimo un piloto asignado (M:N resuelto con VueloPiloto, con el atributo Rol para diferenciar piloto al mando de copiloto)
+- RN-06: Un piloto puede no estar asignado a ningun vuelo en un periodo determinado
+- RN-07: Un pasajero puede reservar varios vuelos y un vuelo puede tener muchos pasajeros (M:N resuelto con Reservacion)
+- RN-08: Una reservacion no puede existir sin vuelo ni sin pasajero
+- RN-09: Un vuelo recien publicado puede no tener reservaciones todavia
+
+![diccionario7](../img/ER/tabla7.png)

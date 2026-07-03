@@ -1,0 +1,51 @@
+# Diccionario de datos - Ejercicio 4: Empresa de ventas al por mayor
+
+**Entidades identificadas:** Cliente, Pedido, Producto, DetallePedido (entidad asociativa)
+
+**Tabla:** _Cliente_
+
+| Campo         | Tipo    | Longitud | Restriciones | Descripcion              |
+| NumeroCliente | INT     | -        | PK,AI,NN     | Identificador del cliente|
+| Nombre        | Varchar | 150      | NN           | Nombre (persona moral)   |
+
+**Tabla:** _Pedido_
+
+| Campo         | Tipo | Longitud | Restriciones | Descripcion              |
+| NumeroPedido  | INT  | -        | PK,AI,NN     | Identificador del pedido |
+| FechaPedido   | Date | -        | NN           | Fecha en que se levanto  |
+| NumeroCliente | INT  | -        | NN,FK        | Cliente que lo realizo   |
+
+**Tabla:** _Producto_
+
+| Campo          | Tipo         | Longitud | Restriciones | Descripcion             |
+| NumeroProducto | INT          | -        | PK,AI,NN     | Identificador del producto |
+| Nombre         | Varchar      | 100      | NN           | Nombre del producto     |
+| Precio         | Decimal(10,2)| -        | NN,CK (>0)   | Precio unitario         |
+
+**Tabla:** _DetallePedido_ (resuelve la relacion N:M entre Pedido y Producto)
+
+| Campo            | Tipo          | Longitud | Restriciones | Descripcion                    |
+| NumeroPedido     | INT           | -        | PK,FK,NN     | Pedido al que pertenece        |
+| NumeroProducto   | INT           | -        | PK,FK,NN     | Producto vendido               |
+| CantidadVendida  | INT           | -        | NN,CK (>0)   | Cantidad vendida               |
+| PrecioVenta      | Decimal(10,2) | -        | NN           | Precio al momento de la venta  |
+
+**Cardinalidad y participacion**
+
+| Relacion                    | Cardinalidad | Participacion lado 1     | Participacion lado N     |
+| Cliente - Pedido            | 1:N          | Obligatoria (Cliente)    | Opcional (Pedido)        |
+| Pedido - DetallePedido      | 1:N          | Obligatoria (Pedido)     | Obligatoria (Detalle)    |
+| Producto - DetallePedido    | 1:N          | Obligatoria (Producto)   | Opcional (Detalle)       |
+
+**Reglas de negocio aplicadas**
+- RN-01: Un cliente puede realizar muchos pedidos
+- RN-02: Cada pedido pertenece a un solo cliente
+- RN-03: Un pedido contiene varios productos (a traves de DetallePedido)
+- RN-04: Un producto puede aparecer en muchos pedidos
+- RN-05: Un pedido debe contener al menos un producto (participacion obligatoria de Pedido hacia Detalle)
+- RN-06: Un producto puede no haber sido vendido (participacion opcional de Producto hacia Detalle)
+- RN-07: El detalle del pedido no existe sin pedido
+- RN-08: El detalle del pedido no existe sin producto
+- RN-09: La clave primaria de DetallePedido es compuesta (NumeroPedido + NumeroProducto)
+
+![diccionario4](../img/ER/tablas4.png)
